@@ -127,61 +127,80 @@ const PopularSidebar = ({ posts }) => (
 )
 
 /* ── Recent comments sidebar ───────────────────────── */
-const MOCK_COMMENTS = [
-  {
-    id: 1,
-    emoji: "🐝",
-    name: "다정한나비",
-    text: "바이브 코딩은 해보고 skills 서브에이전트 mcp는 해보고...",
-    post: "Gatsby + GraphQL로 정적 블로그 만들기",
-  },
-  {
-    id: 2,
-    emoji: "🌿",
-    name: "호석이2마리치킨",
-    text: "재밌게 잘 읽었습니다. 비유가 너무 적절했어요. 공감이 많이 갑니다.",
-    post: "Tailwind CSS로 빠르게 UI 만들기",
-  },
-  {
-    id: 3,
-    emoji: "🦊",
-    name: "코딩하는여우",
-    text: "덕분에 GraphQL 개념을 확실히 잡았어요. 예제 코드가 특히 도움됐습니다!",
-    post: "Gatsby + GraphQL로 정적 블로그 만들기",
-  },
-  {
-    id: 4,
-    emoji: "🐳",
-    name: "파란고래",
-    text: "처음 블로그 시작하시는 거군요. 앞으로 좋은 글 많이 부탁드려요 :)",
-    post: "안녕하세요, 오또니 블로그입니다!",
-  },
-]
+const RecentCommentsSidebar = () => {
+  const [comments, setComments] = React.useState([])
+  const [loading, setLoading] = React.useState(true)
 
-const RecentCommentsSidebar = () => (
-  <div className="bg-gray-100 rounded-2xl p-6">
-    <h3 className="text-sm font-bold text-gray-900 mb-4">최신 댓글</h3>
-    <div className="space-y-3">
-      {MOCK_COMMENTS.slice(0, 4).map(c => (
-        <div
-          key={c.id}
-          className="bg-white rounded-xl p-4 flex items-start gap-3"
-        >
-          <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-lg shrink-0">
-            {c.emoji}
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-gray-700 mb-1">{c.name}</p>
-            <p className="text-sm font-medium text-gray-800 leading-snug line-clamp-2">
-              {c.text}
-            </p>
-            <p className="text-xs text-gray-400 mt-2 truncate">{c.post}</p>
-          </div>
+  React.useEffect(() => {
+    fetch("/.netlify/functions/recent-comments")
+      .then(res => res.json())
+      .then(data => {
+        setComments(data.comments ?? [])
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
+
+  return (
+    <div className="bg-gray-100 rounded-2xl p-6">
+      <h3 className="text-sm font-bold text-gray-900 mb-4">최신 댓글</h3>
+
+      {loading && (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="bg-white rounded-xl p-4 flex items-start gap-3 animate-pulse">
+              <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+                <div className="h-3 bg-gray-200 rounded w-full" />
+                <div className="h-2 bg-gray-200 rounded w-2/3" />
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      )}
+
+      {!loading && comments.length === 0 && (
+        <p className="text-sm text-gray-400 text-center py-4">
+          아직 작성된 댓글이 없습니다.
+        </p>
+      )}
+
+      {!loading && comments.length > 0 && (
+        <div className="space-y-3">
+          {comments.map((c, i) => (
+            <a
+              key={i}
+              href={c.commentUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors block"
+            >
+              {c.avatarUrl ? (
+                <img
+                  src={c.avatarUrl}
+                  alt={c.author}
+                  className="w-9 h-9 rounded-full shrink-0 object-cover"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0 flex items-center justify-center text-sm font-bold text-gray-500">
+                  {c.author?.[0]?.toUpperCase() ?? "?"}
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-xs font-semibold text-gray-700 mb-1">{c.author}</p>
+                <p className="text-sm font-medium text-gray-800 leading-snug line-clamp-2">
+                  {c.body}
+                </p>
+                <p className="text-xs text-gray-400 mt-2 truncate">{c.postTitle}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
-  </div>
-)
+  )
+}
 
 /* ── Page ──────────────────────────────────────────── */
 const IndexPage = ({ data, location }) => {

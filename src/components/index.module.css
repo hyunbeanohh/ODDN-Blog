@@ -1,0 +1,14 @@
+/*
+ * Most styles are now handled via Tailwind utility classes in index.js.
+ * This file keeps only legacy class names that might be referenced
+ * elsewhere in the project.
+ */
+
+.textCenter {
+  text-align: center;
+}
+
+.intro {
+  max-width: none;
+  line-height: 1.75;
+}

@@ -332,7 +332,7 @@ const Header = ({ siteTitle, location }) => {
 
             {/* GitHub link */}
             <a
-              href="https://github.com/hyunbeanohh/ODDN-Blog"
+              href="https://github.com/hyunbeanohh/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub 저장소"

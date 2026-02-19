@@ -17,9 +17,13 @@ export const ThemeProvider = ({ children }) => {
 
   const toggleTheme = () => {
     const next = theme === "light" ? "dark" : "light"
+    document.documentElement.classList.add("is-theme-transitioning")
     setTheme(next)
     localStorage.setItem("theme", next)
     document.documentElement.setAttribute("data-theme", next)
+    setTimeout(() => {
+      document.documentElement.classList.remove("is-theme-transitioning")
+    }, 250)
   }
 
   return (

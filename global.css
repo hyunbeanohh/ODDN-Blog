@@ -36,13 +36,19 @@
 }
 
 /* ── 테마 전환 트랜지션 ─────────────────────────────── */
-body {
-  transition: background-color 0.2s ease, color 0.15s ease;
+/* 토글 버튼 클릭 시에만 일시적으로 모든 요소에 트랜지션 적용 */
+html.is-theme-transitioning *,
+html.is-theme-transitioning *::before,
+html.is-theme-transitioning *::after {
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, fill 0.2s ease !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  body {
-    transition: none;
+  html.is-theme-transitioning *,
+  html.is-theme-transitioning *::before,
+  html.is-theme-transitioning *::after {
+    transition: none !important;
   }
 }
 

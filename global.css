@@ -14,5 +14,180 @@
     --color-surface: #f9fafb;
     --color-border: #e5e7eb;
     --color-border-light: #f3f4f6;
+    /* 헤더 전용 변수 */
+    --color-header-bg: rgba(255, 255, 255, 0.95);
+    --color-header-border: #f3f4f6;
   }
+
+  [data-theme="dark"] {
+    --color-primary: #9b5de5;
+    --color-primary-light: #1e1030;
+    --color-primary-border: #2d1e4a;
+    --color-text: #e5e7eb;
+    --color-text-secondary: #9ca3af;
+    --color-text-muted: #6b7280;
+    --color-bg: #111827;
+    --color-surface: #1f2937;
+    --color-border: #374151;
+    --color-border-light: #1f2937;
+    --color-header-bg: rgba(17, 24, 39, 0.95);
+    --color-header-border: #1f2937;
+  }
+}
+
+/* ── 테마 전환 트랜지션 ─────────────────────────────── */
+body {
+  transition: background-color 0.2s ease, color 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+}
+
+/* ── ThemeToggle 버튼 ──────────────────────────────── */
+.theme-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.2s ease, transform 0.2s ease,
+    background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle {
+    transition: none;
+  }
+}
+
+/* ── 다크 모드 Tailwind 유틸리티 오버라이드 ──────────── */
+
+/* 배경색 */
+[data-theme="dark"] .bg-white {
+  background-color: #111827;
+}
+[data-theme="dark"] .bg-gray-50 {
+  background-color: #111827;
+}
+[data-theme="dark"] .bg-gray-100 {
+  background-color: #1f2937;
+}
+[data-theme="dark"] .bg-gray-200 {
+  background-color: #374151;
+}
+
+/* hover 배경색 */
+[data-theme="dark"] .hover\:bg-gray-50:hover {
+  background-color: #374151;
+}
+[data-theme="dark"] .hover\:bg-gray-100:hover {
+  background-color: #4b5563;
+}
+
+/* 텍스트색 */
+[data-theme="dark"] .text-gray-900 {
+  color: #f3f4f6;
+}
+[data-theme="dark"] .text-gray-800 {
+  color: #e5e7eb;
+}
+[data-theme="dark"] .text-gray-700 {
+  color: #d1d5db;
+}
+[data-theme="dark"] .text-gray-600 {
+  color: #9ca3af;
+}
+[data-theme="dark"] .text-gray-500 {
+  color: #6b7280;
+}
+[data-theme="dark"] .text-gray-400 {
+  color: #6b7280;
+}
+
+/* 테두리색 */
+[data-theme="dark"] .border-gray-100 {
+  border-color: #374151;
+}
+[data-theme="dark"] .border-gray-200 {
+  border-color: #4b5563;
+}
+
+/* 카테고리 배지 배경 (다크 모드에서 배경을 반투명하게) */
+[data-theme="dark"] .bg-blue-50 {
+  background-color: rgba(37, 99, 235, 0.15);
+}
+[data-theme="dark"] .bg-emerald-50 {
+  background-color: rgba(5, 150, 105, 0.15);
+}
+[data-theme="dark"] .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.15);
+}
+[data-theme="dark"] .bg-purple-50 {
+  background-color: rgba(124, 58, 237, 0.15);
+}
+
+/* group-hover 텍스트색 */
+[data-theme="dark"] .group:hover .group-hover\:text-blue-600 {
+  color: #60a5fa;
+}
+[data-theme="dark"] .hover\:text-blue-600:hover {
+  color: #60a5fa;
+}
+[data-theme="dark"] .hover\:text-gray-700:hover {
+  color: #d1d5db;
+}
+
+/* ── 다크 모드 Prose (Tailwind Typography) ─────────── */
+[data-theme="dark"] .prose {
+  --tw-prose-body: #e5e7eb;
+  --tw-prose-headings: #f9fafb;
+  --tw-prose-lead: #9ca3af;
+  --tw-prose-links: #60a5fa;
+  --tw-prose-bold: #f9fafb;
+  --tw-prose-counters: #9ca3af;
+  --tw-prose-bullets: #9ca3af;
+  --tw-prose-hr: #374151;
+  --tw-prose-quotes: #e5e7eb;
+  --tw-prose-quote-borders: #7c3aed;
+  --tw-prose-captions: #9ca3af;
+  --tw-prose-code: #c084fc;
+  --tw-prose-pre-code: #e5e7eb;
+  --tw-prose-pre-bg: #111827;
+  --tw-prose-th-borders: #374151;
+  --tw-prose-td-borders: #1f2937;
+  color: #e5e7eb;
+}
+
+/* prose 내부 인라인 코드 다크 모드 */
+[data-theme="dark"] .prose code:not(pre code) {
+  background-color: #2d1b5e;
+  color: #c084fc;
+}
+
+/* prose 내부 pre 다크 모드 */
+[data-theme="dark"] .prose pre {
+  background-color: #111827;
 }

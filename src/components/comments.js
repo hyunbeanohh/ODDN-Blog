@@ -1,5 +1,6 @@
 import * as React from "react"
 import Giscus from "@giscus/react"
+import { useTheme } from "../context/ThemeContext"
 
 /**
  * Giscus 댓글 컴포넌트 (GitHub Discussions 기반)
@@ -23,6 +24,7 @@ const GISCUS_CONFIG = {
 }
 
 const Comments = () => {
+  const { theme } = useTheme()
   const isConfigured =
     GISCUS_CONFIG.repo !== "owner/repo" &&
     GISCUS_CONFIG.repoId !== "" &&
@@ -67,7 +69,7 @@ const Comments = () => {
         reactionsEnabled="1"
         emitMetadata="0"
         inputPosition="bottom"
-        theme="light"
+        theme={theme === "dark" ? "dark" : "light"}
         lang="ko"
         loading="lazy"
       />

@@ -50,7 +50,7 @@ const ArticleCard = ({ post }) => {
     <article className="border-b border-gray-100 last:border-0">
       <Link
         to={slug}
-        className="flex justify-between items-start gap-6 py-7 group hover:bg-gray-50 -mx-4 px-4 rounded-xl transition-colors"
+        className="flex justify-between items-start gap-6 py-7 group -mx-4 px-4 rounded-xl transition-colors"
       >
         {/* Text content */}
         <div className="flex-1 min-w-0">

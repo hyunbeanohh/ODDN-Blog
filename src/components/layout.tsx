@@ -5,7 +5,11 @@ import Header from "./header"
 import { useTheme } from "../context/ThemeContext"
 import "./layout.css"
 
-/* ── Sun icon (라이트 모드 전환 아이콘) ─────────────── */
+interface LayoutProps {
+  children: React.ReactNode
+  location?: { search?: string }
+}
+
 const SunIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +35,6 @@ const SunIcon = () => (
   </svg>
 )
 
-/* ── Moon icon (다크 모드 전환 아이콘) ──────────────── */
 const MoonIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -49,23 +52,21 @@ const MoonIcon = () => (
   </svg>
 )
 
-/* ── ThemeToggle 버튼 (우측 하단 고정) ──────────────── */
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme()
 
   return (
     <button
       onClick={toggleTheme}
-      className="theme-toggle"
       aria-label={theme === "light" ? "다크 모드로 전환" : "라이트 모드로 전환"}
+      className="fixed bottom-6 right-6 z-[100] w-11 h-11 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex items-center justify-center cursor-pointer shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
     >
       {theme === "light" ? <MoonIcon /> : <SunIcon />}
     </button>
   )
 }
 
-/* ── Layout ─────────────────────────────────────────── */
-const Layout = ({ children, location }) => {
+const Layout = ({ children, location }: LayoutProps) => {
   const data = useStaticQuery(graphql`
     query SiteTitleQuery {
       site {
@@ -82,39 +83,13 @@ const Layout = ({ children, location }) => {
         siteTitle={data.site.siteMetadata?.title || `Title`}
         location={location}
       />
-      <div
-        style={{
-          maxWidth: "var(--size-content)",
-          margin: "0 auto",
-          padding: "0 1.5rem",
-          minHeight: "calc(100vh - 60px)",
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <main style={{ flex: 1 }}>{children}</main>
-        <footer
-          style={{
-            marginTop: "var(--space-6)",
-            paddingTop: "var(--space-4)",
-            paddingBottom: "var(--space-5)",
-            borderTop: "1px solid var(--color-border-light)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            fontSize: "var(--font-sm)",
-            color: "var(--color-text-muted)",
-            flexWrap: "wrap",
-            gap: "8px",
-            textAlign: "center",
-            alignSelf: "center",
-          }}
-        >
+      <div className="max-w-5xl mx-auto px-6 min-h-[calc(100vh-60px)] flex flex-col">
+        <main className="flex-1">{children}</main>
+        <footer className="mt-16 pt-6 pb-8 border-t border-gray-100 dark:border-gray-800 flex justify-center items-center flex-wrap gap-2 text-sm text-gray-400 dark:text-gray-500 text-center">
           <span>© {new Date().getFullYear()} 오또니 블로그</span>
         </footer>
       </div>
 
-      {/* 우측 하단 고정 테마 토글 버튼 */}
       <ThemeToggle />
     </>
   )

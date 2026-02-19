@@ -4,22 +4,46 @@ import { graphql, Link } from "gatsby"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 
-/* ── Category badge color map ──────────────────────── */
-const categoryStyle = {
-  Engineering: "bg-blue-50 text-blue-600",
-  Design: "bg-emerald-50 text-emerald-600",
-  Product: "bg-orange-50 text-orange-600",
-  일상: "bg-purple-50 text-purple-600",
-  블로그: "bg-purple-50 text-purple-600",
+interface PostNode {
+  id: string
+  parent?: { name?: string } | null
+  frontmatter: {
+    title?: string
+    date?: string
+    description?: string
+    tags?: string[]
+    author?: string
+  }
+  excerpt?: string
 }
 
-const badgeClass = tag =>
+interface PageData {
+  allMdx?: {
+    nodes: PostNode[]
+  }
+}
+
+interface IndexPageProps {
+  data: PageData
+  location: { search?: string }
+}
+
+/* ── Category badge color map ──────────────────────── */
+const categoryStyle: Record<string, string> = {
+  Engineering: "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400",
+  Design: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400",
+  Product: "bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400",
+  일상: "bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400",
+  블로그: "bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400",
+}
+
+const badgeClass = (tag: string) =>
   `text-xs px-3 py-1 rounded-full font-medium ${
-    categoryStyle[tag] ?? "bg-gray-100 text-gray-600"
+    categoryStyle[tag] ?? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
   }`
 
 /* ── Thumbnail placeholder ─────────────────────────── */
-const thumbnailGradient = {
+const thumbnailGradient: Record<string, string> = {
   Engineering: "from-slate-700 to-slate-900",
   Design: "from-emerald-400 to-teal-600",
   Product: "from-orange-400 to-rose-500",
@@ -27,7 +51,7 @@ const thumbnailGradient = {
   블로그: "from-violet-400 to-purple-600",
 }
 
-const ThumbnailPlaceholder = ({ tag }) => {
+const ThumbnailPlaceholder = ({ tag }: { tag: string }) => {
   const gradient = thumbnailGradient[tag] ?? "from-gray-300 to-gray-400"
   return (
     <div
@@ -41,39 +65,36 @@ const ThumbnailPlaceholder = ({ tag }) => {
 }
 
 /* ── Article card ──────────────────────────────────── */
-const ArticleCard = ({ post }) => {
+const ArticleCard = ({ post }: { post: PostNode }) => {
   const { title, date, description, tags, author } = post.frontmatter
   const tag = tags?.[0] ?? "일반"
   const slug = post.parent?.name ? `/blog/${post.parent.name}` : "/"
 
   return (
-    <article className="border-b border-gray-100 last:border-0">
+    <article className="border-b border-gray-100 dark:border-gray-800 last:border-0">
       <Link
         to={slug}
-        className="flex justify-between items-start gap-6 py-7 group -mx-4 px-4 rounded-xl transition-colors"
+        className="flex justify-between items-start gap-6 py-7 group -mx-4 px-4 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
       >
-        {/* Text content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             <span className={badgeClass(tag)}>{tag}</span>
             {author && (
-              <span className="text-xs text-gray-400 font-medium">{author}</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">{author}</span>
             )}
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2 leading-snug tracking-tight group-hover:text-blue-600 transition-colors">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {title ?? "제목 없음"}
           </h3>
           {(description || post.excerpt) && (
-            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
               {description ?? post.excerpt}
             </p>
           )}
           {date && (
-            <span className="text-xs text-gray-400 mt-3 block">{date}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500 mt-3 block">{date}</span>
           )}
         </div>
-
-        {/* Thumbnail */}
         <ThumbnailPlaceholder tag={tag} />
       </Link>
     </article>
@@ -82,8 +103,8 @@ const ArticleCard = ({ post }) => {
 
 /* ── Empty state ───────────────────────────────────── */
 const EmptyState = () => (
-  <div className="text-center py-16 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-    <p className="text-sm font-semibold text-gray-500">
+  <div className="text-center py-16 bg-gray-50 dark:bg-gray-800 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+    <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
       아직 작성된 글이 없습니다.
     </p>
   </div>
@@ -96,9 +117,9 @@ const rankColor = [
   "bg-blue-300 text-white",
 ]
 
-const PopularSidebar = ({ posts }) => (
-  <div className="bg-gray-100 rounded-2xl p-6">
-    <h3 className="text-sm font-bold text-gray-900 mb-5">인기 있는 글</h3>
+const PopularSidebar = ({ posts }: { posts: PostNode[] }) => (
+  <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-6">
+    <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-5">인기 있는 글</h3>
     <ol className="space-y-4 pl-0">
       {posts.slice(0, 3).map((post, i) => (
         <li key={post.id} className="flex items-start gap-3">
@@ -110,12 +131,12 @@ const PopularSidebar = ({ posts }) => (
           <div className="min-w-0">
             <Link
               to={post.parent?.name ? `/blog/${post.parent.name}` : "/"}
-              className="text-sm font-semibold text-gray-800 leading-snug line-clamp-2 hover:text-blue-600 transition-colors"
+              className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               {post.frontmatter.title}
             </Link>
             {post.frontmatter.author && (
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                 {post.frontmatter.author}
               </p>
             )}
@@ -127,8 +148,16 @@ const PopularSidebar = ({ posts }) => (
 )
 
 /* ── Recent comments sidebar ───────────────────────── */
+interface CommentItem {
+  commentUrl?: string
+  avatarUrl?: string
+  author?: string
+  body?: string
+  postTitle?: string
+}
+
 const RecentCommentsSidebar = () => {
-  const [comments, setComments] = React.useState([])
+  const [comments, setComments] = React.useState<CommentItem[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
@@ -142,18 +171,18 @@ const RecentCommentsSidebar = () => {
   }, [])
 
   return (
-    <div className="bg-gray-100 rounded-2xl p-6">
-      <h3 className="text-sm font-bold text-gray-900 mb-4">최신 댓글</h3>
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-6">
+      <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-4">최신 댓글</h3>
 
       {loading && (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-xl p-4 flex items-start gap-3 animate-pulse">
-              <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0" />
+            <div key={i} className="bg-white dark:bg-gray-700 rounded-xl p-4 flex items-start gap-3 animate-pulse">
+              <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-600 shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="h-3 bg-gray-200 rounded w-1/3" />
-                <div className="h-3 bg-gray-200 rounded w-full" />
-                <div className="h-2 bg-gray-200 rounded w-2/3" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-1/3" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-full" />
+                <div className="h-2 bg-gray-200 dark:bg-gray-600 rounded w-2/3" />
               </div>
             </div>
           ))}
@@ -161,7 +190,7 @@ const RecentCommentsSidebar = () => {
       )}
 
       {!loading && comments.length === 0 && (
-        <p className="text-sm text-gray-400 text-center py-4">
+        <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">
           아직 작성된 댓글이 없습니다.
         </p>
       )}
@@ -174,7 +203,7 @@ const RecentCommentsSidebar = () => {
               href={c.commentUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white rounded-xl p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors block"
+              className="bg-white dark:bg-gray-700 rounded-xl p-4 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors block"
             >
               {c.avatarUrl ? (
                 <img
@@ -183,16 +212,16 @@ const RecentCommentsSidebar = () => {
                   className="w-9 h-9 rounded-full shrink-0 object-cover"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0 flex items-center justify-center text-sm font-bold text-gray-500">
+                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-600 shrink-0 flex items-center justify-center text-sm font-bold text-gray-500 dark:text-gray-400">
                   {c.author?.[0]?.toUpperCase() ?? "?"}
                 </div>
               )}
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-gray-700 mb-1">{c.author}</p>
-                <p className="text-sm font-medium text-gray-800 leading-snug line-clamp-2">
+                <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{c.author}</p>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200 leading-snug line-clamp-2">
                   {c.body}
                 </p>
-                <p className="text-xs text-gray-400 mt-2 truncate">{c.postTitle}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 truncate">{c.postTitle}</p>
               </div>
             </a>
           ))}
@@ -203,10 +232,9 @@ const RecentCommentsSidebar = () => {
 }
 
 /* ── Page ──────────────────────────────────────────── */
-const IndexPage = ({ data, location }) => {
+const IndexPage = ({ data, location }: IndexPageProps) => {
   const allPosts = data?.allMdx?.nodes ?? []
 
-  /* Category filter from URL query param */
   const activeCategory = React.useMemo(() => {
     if (!location?.search) return null
     return new URLSearchParams(location.search).get("category")
@@ -222,23 +250,22 @@ const IndexPage = ({ data, location }) => {
     <Layout location={location}>
       <div className="py-8">
         <div className="flex items-center gap-3 mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {pageTitle}
           </h1>
           {activeCategory && (
-            <span className="text-sm text-gray-400 font-normal">
+            <span className="text-sm text-gray-400 dark:text-gray-500 font-normal">
               {posts.length}개의 글
             </span>
           )}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* ── Article list ── col-span-2 */}
           <section className="lg:col-span-2">
             {posts.length === 0 ? (
               <EmptyState />
             ) : (
-              <div className="rounded-xl bg-white text-gray-800">
+              <div className="rounded-xl bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
                 {posts.map(post => (
                   <ArticleCard key={post.id} post={post} />
                 ))}
@@ -246,7 +273,6 @@ const IndexPage = ({ data, location }) => {
             )}
           </section>
 
-          {/* ── Sidebar ── col-span-1 */}
           <aside className="lg:col-span-1 space-y-4">
             {allPosts.length > 0 && <PopularSidebar posts={allPosts} />}
             <RecentCommentsSidebar />

@@ -1,22 +1,26 @@
-import React, { createContext, useContext, useState, useEffect } from "react"
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react"
 
-const ThemeContext = createContext({
+interface ThemeContextValue {
+  theme: "light" | "dark"
+  toggleTheme: () => void
+}
+
+const ThemeContext = createContext<ThemeContextValue>({
   theme: "light",
   toggleTheme: () => {},
 })
 
-export const ThemeProvider = ({ children }) => {
-  // SSR 기본값은 "light", 클라이언트 useEffect에서 localStorage와 동기화
-  const [theme, setTheme] = useState("light")
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  const [theme, setTheme] = useState<"light" | "dark">("light")
 
   useEffect(() => {
-    const stored = localStorage.getItem("theme") || "light"
+    const stored = (localStorage.getItem("theme") as "light" | "dark") || "light"
     setTheme(stored)
     document.documentElement.setAttribute("data-theme", stored)
   }, [])
 
   const toggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light"
+    const next: "light" | "dark" = theme === "light" ? "dark" : "light"
     document.documentElement.classList.add("is-theme-transitioning")
     setTheme(next)
     localStorage.setItem("theme", next)

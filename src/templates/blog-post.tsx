@@ -203,12 +203,45 @@ const BlogPost = ({ data, children, location }: BlogPostProps) => {
   )
 }
 
-export const Head = ({ data }: { data: BlogPostData }) => (
-  <Seo
-    title={data.mdx.frontmatter.title ?? ""}
-    description={data.mdx.frontmatter.description}
-  />
-)
+export const Head = ({
+  data,
+  location,
+}: {
+  data: BlogPostData
+  location: { pathname: string }
+}) => {
+  const { title, description, date, author } = data.mdx.frontmatter
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    description: description,
+    datePublished: date,
+    author: {
+      "@type": "Person",
+      name: author || "오또니",
+    },
+    url: `https://oddn.ai.kr${location.pathname}`,
+    image: "https://oddn.ai.kr/profile.jpeg",
+    publisher: {
+      "@type": "Person",
+      name: "오또니",
+      url: "https://oddn.ai.kr",
+    },
+  }
+
+  return (
+    <Seo
+      title={title ?? ""}
+      description={description}
+      pathname={location.pathname}
+      type="article"
+    >
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+    </Seo>
+  )
+}
 
 export const query = graphql`
   query BlogPost($id: String!) {

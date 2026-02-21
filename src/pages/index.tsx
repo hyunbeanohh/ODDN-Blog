@@ -283,7 +283,23 @@ const IndexPage = ({ data, location }: IndexPageProps) => {
   )
 }
 
-export const Head = () => <Seo title="홈" />
+export const Head = ({ location }: { location: { pathname: string } }) => (
+  <Seo title="홈" pathname={location.pathname}>
+    <script type="application/ld+json">
+      {JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        name: "오또니",
+        url: "https://oddn.ai.kr",
+        description: "오또니의 개발 블로그",
+        author: {
+          "@type": "Person",
+          name: "오또니",
+        },
+      })}
+    </script>
+  </Seo>
+)
 
 export const query = graphql`
   query HomePageQuery {

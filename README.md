@@ -1,106 +1,91 @@
-<!-- AUTO-GENERATED-CONTENT:START (STARTER) -->
-<p align="center">
-  <a href="https://www.gatsbyjs.com">
-    <img alt="Gatsby" src="https://www.gatsbyjs.com/Gatsby-Monogram.svg" width="60" />
-  </a>
-</p>
-<h1 align="center">
-  Gatsby's default starter
-</h1>
+# 오또니의 개발 블로그
 
-Kick off your project with this default boilerplate. This starter ships with the main Gatsby configuration files you might need to get up and running blazing fast with the blazing fast app generator for React.
+Gatsby + MDX + Tailwind CSS로 만든 개인 기술 블로그입니다.
 
-_Have another more specific idea? You may want to check out our vibrant collection of [official and community-created starters](https://www.gatsbyjs.com/docs/gatsby-starters/)._
+## 기술 스택
 
-## ⚠️ Node.js 버전
+| 분류 | 기술 |
+|---|---|
+| 프레임워크 | [Gatsby 5](https://www.gatsbyjs.com/) |
+| 언어 | TypeScript |
+| 스타일링 | [Tailwind CSS](https://tailwindcss.com/) |
+| 콘텐츠 | MDX (`gatsby-plugin-mdx`) |
+| 댓글 | [Giscus](https://giscus.app/) |
+| 배포 | [Netlify](https://www.netlify.com/) |
 
-이 프로젝트는 **Node.js 18~22**를 사용해야 합니다. Node 23/24에서는 Gatsby LMDB 호환 문제로 `ERR_BUFFER_OUT_OF_BOUNDS` 오류가 발생할 수 있습니다.
+## 시작하기
 
-- **nvm** 사용 시: `nvm use` (프로젝트 루트의 `.nvmrc`에 22 지정됨)
-- 또는 [Node.js 22 LTS](https://nodejs.org/) 설치 후 사용
+### 요구사항
 
-## 🚀 Quick start
+> Node.js **18 ~ 22** 버전을 사용해야 합니다.
+> Node.js 23 이상에서는 Gatsby LMDB 호환 문제로 `ERR_BUFFER_OUT_OF_BOUNDS` 오류가 발생할 수 있습니다.
 
-1.  **Create a Gatsby site.**
+```bash
+# nvm 사용 시 (프로젝트 루트의 .nvmrc에 22 지정됨)
+nvm use
+```
 
-    Use the Gatsby CLI ([install instructions](https://www.gatsbyjs.com/docs/tutorial/getting-started/part-0/#gatsby-cli)) to create a new site, specifying the default starter.
+### 설치 및 실행
 
-    ```shell
-    # create a new Gatsby site using the default starter
-    gatsby new my-default-starter https://github.com/gatsbyjs/gatsby-starter-default
-    ```
+```bash
+# 의존성 설치
+npm install
 
-1.  **Start developing.**
+# 개발 서버 실행 (http://localhost:8000)
+npm run develop
 
-    Navigate into your new site’s directory and start it up.
+# MDX 파일 변경 감지와 함께 개발 서버 실행
+npm run develop:watch
 
-    ```shell
-    cd my-default-starter/
-    gatsby develop
-    ```
+# 프로덕션 빌드
+npm run build
 
-1.  **Open the source code and start editing!**
+# 빌드 결과물 로컬 미리보기
+npm run serve
 
-    Your site is now running at `http://localhost:8000`!
+# 빌드 캐시 초기화
+npm run clean
+```
 
-    Note: You'll also see a second link: `http://localhost:8000/___graphql`. This is a tool you can use to experiment with querying your data. Learn more about using this tool in the [Gatsby Tutorial](https://www.gatsbyjs.com/docs/tutorial/getting-started/part-4/#use-graphiql-to-explore-the-data-layer-and-write-graphql-queries).
+## 프로젝트 구조
 
-    Open the `my-default-starter` directory in your code editor of choice and edit `src/pages/index.js`. Save your changes and the browser will update in real time!
+```
+.
+├── content/
+│   └── blog/          # MDX 블로그 포스트
+├── src/
+│   ├── components/    # 재사용 컴포넌트
+│   ├── context/       # React Context
+│   ├── pages/         # 페이지 컴포넌트
+│   └── templates/     # 포스트 템플릿
+├── static/            # 정적 파일
+├── gatsby-config.js   # Gatsby 설정
+├── gatsby-node.js     # 빌드 시 페이지 생성 로직
+├── tailwind.config.js # Tailwind CSS 설정
+├── watch-mdx.js       # MDX 파일 변경 감지 스크립트
+└── netlify.toml       # Netlify 배포 설정
+```
 
-## 🚀 Quick start (Netlify)
+## 블로그 포스트 작성
 
-Deploy this starter with one click on [Netlify](https://app.netlify.com/signup):
+`content/blog/` 디렉터리에 `.mdx` 파일을 추가합니다.
 
-[<img src="https://www.netlify.com/img/deploy/button.svg" alt="Deploy to Netlify" />](https://app.netlify.com/start/deploy?repository=https://github.com/gatsbyjs/gatsby-starter-default)
+```mdx
+---
+title: 포스트 제목
+date: "2026-01-01"
+description: 포스트 요약
+tags: ["태그"]
+author: 오또니
+---
 
-## 🧐 What's inside?
+본문 내용
+```
 
-A quick look at the top-level files and directories you'll see in a typical Gatsby project.
+## 배포
 
-    .
-    ├── node_modules
-    ├── src
-    ├── .gitignore
-    ├── gatsby-browser.js
-    ├── gatsby-config.js
-    ├── gatsby-node.js
-    ├── gatsby-ssr.js
-    ├── LICENSE
-    ├── package.json
-    └── README.md
+Netlify를 통해 자동 배포됩니다. `main` 브랜치에 푸시하면 빌드 및 배포가 트리거됩니다.
 
-1.  **`/node_modules`**: This directory contains all of the modules of code that your project depends on (npm packages) are automatically installed.
+## 라이선스
 
-1.  **`/src`**: This directory will contain all of the code related to what you will see on the front-end of your site (what you see in the browser) such as your site header or a page template. `src` is a convention for “source code”.
-
-1.  **`.gitignore`**: This file tells git which files it should not track / not maintain a version history for.
-
-1.  **`gatsby-browser.js`**: This file is where Gatsby expects to find any usage of the [Gatsby browser APIs](https://www.gatsbyjs.com/docs/reference/config-files/gatsby-browser/) (if any). These allow customization/extension of default Gatsby settings affecting the browser.
-
-1.  **`gatsby-config.js`**: This is the main configuration file for a Gatsby site. This is where you can specify information about your site (metadata) like the site title and description, which Gatsby plugins you’d like to include, etc. (Check out the [config docs](https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/) for more detail).
-
-1.  **`gatsby-node.js`**: This file is where Gatsby expects to find any usage of the [Gatsby Node APIs](https://www.gatsbyjs.com/docs/reference/config-files/gatsby-node/) (if any). These allow customization/extension of default Gatsby settings affecting pieces of the site build process.
-
-1.  **`gatsby-ssr.js`**: This file is where Gatsby expects to find any usage of the [Gatsby server-side rendering APIs](https://www.gatsbyjs.com/docs/reference/config-files/gatsby-ssr/) (if any). These allow customization of default Gatsby settings affecting server-side rendering.
-
-1.  **`LICENSE`**: This Gatsby starter is licensed under the 0BSD license. This means that you can see this file as a placeholder and replace it with your own license.
-
-1.  **`package.json`**: A manifest file for Node.js projects, which includes things like metadata (the project’s name, author, etc). This manifest is how npm knows which packages to install for your project.
-
-1.  **`README.md`**: A text file containing useful reference information about your project.
-
-## 🎓 Learning Gatsby
-
-Looking for more guidance? Full documentation for Gatsby lives [on the website](https://www.gatsbyjs.com/). Here are some places to start:
-
-- **For most developers, we recommend starting with our [in-depth tutorial for creating a site with Gatsby](https://www.gatsbyjs.com/docs/tutorial/getting-started/).** It starts with zero assumptions about your level of ability and walks through every step of the process.
-
-- **To dive straight into code samples, head [to our documentation](https://www.gatsbyjs.com/docs/).** In particular, check out the _Guides_, _API Reference_, and _Advanced Tutorials_ sections in the sidebar.
-
-## 💫 Deploy
-
-[Build, Deploy, and Host On Netlify](https://netlify.com)
-
-The fastest way to combine your favorite tools and APIs to build the fastest sites, stores, and apps for the web. And also the best place to build, deploy, and host your Gatsby sites.
-
-<!-- AUTO-GENERATED-CONTENT:END -->
+0BSD

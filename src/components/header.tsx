@@ -1,5 +1,6 @@
 import * as React from "react"
 import { Link, navigate, useStaticQuery, graphql } from "gatsby"
+import { StaticImage } from "gatsby-plugin-image"
 import { useTheme } from "../context/ThemeContext"
 
 const CATEGORIES = ["Engineering", "Design", "Product"]
@@ -180,10 +181,17 @@ const Header = ({ siteTitle, location }: HeaderProps) => {
             to="/"
             className="flex items-center gap-2.5 font-bold text-[0.9375rem] text-gray-900 dark:text-gray-100 tracking-tight no-underline"
           >
-            <img
-              src="/profile.jpeg"
+            <StaticImage
+              src="../images/profile.jpeg"
               alt="프로필"
-              className="w-8 h-8 rounded-full object-cover shrink-0"
+              className="!w-8 !h-8 rounded-full overflow-hidden shrink-0"
+              imgClassName="rounded-full"
+              width={64}
+              height={64}
+              quality={85}
+              formats={["auto", "webp", "avif"]}
+              loading="eager"
+              placeholder="blurred"
             />
             {siteTitle}
           </Link>

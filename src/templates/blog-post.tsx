@@ -112,6 +112,7 @@ interface BlogPostData {
     frontmatter: {
       title?: string
       date?: string
+      dateRaw?: string
       description?: string
       tags?: string[]
       author?: string
@@ -210,17 +211,18 @@ export const Head = ({
   data: BlogPostData
   location: { pathname: string }
 }) => {
-  const { title, description, date, author } = data.mdx.frontmatter
+  const { title, description, dateRaw, author } = data.mdx.frontmatter
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: title,
     description: description,
-    datePublished: date,
+    datePublished: dateRaw,
     author: {
       "@type": "Person",
       name: author || "오또니",
+      url: "https://oddn.ai.kr",
     },
     url: `https://oddn.ai.kr${location.pathname}`,
     image: "https://oddn.ai.kr/profile.jpeg",
@@ -249,6 +251,7 @@ export const query = graphql`
       frontmatter {
         title
         date(formatString: "YYYY년 M월 D일")
+        dateRaw: date
         description
         tags
         author

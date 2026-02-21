@@ -18,3 +18,49 @@ html.is-theme-transitioning *::after {
     transition: none !important;
   }
 }
+
+/* ── 테마 토글 아이콘 애니메이션 ────────────────────── */
+.theme-icon-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.theme-icon-sun,
+.theme-icon-moon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
+}
+
+/* 라이트 모드: 태양 표시, 달 숨김 */
+.theme-icon-sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+.theme-icon-moon {
+  opacity: 0;
+  transform: rotate(90deg) scale(0.7);
+}
+
+/* 다크 모드: 달 표시, 태양 숨김 */
+[data-theme="dark"] .theme-icon-sun {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.7);
+}
+[data-theme="dark"] .theme-icon-moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-icon-sun,
+  .theme-icon-moon {
+    transition: opacity 0.15s ease;
+    transform: none !important;
+  }
+}

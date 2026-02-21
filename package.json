@@ -17,9 +17,11 @@
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
+    "chokidar": "^4.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.4.24",
+    "chokidar": "^5.0.0",
     "gatsby-plugin-postcss": "^6.16.0",
     "postcss": "^8.5.6",
     "prettier": "^2.8.8",
@@ -40,6 +42,7 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
+    "develop:watch": "node watch-mdx.js",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "start": "gatsby develop",
     "serve": "gatsby serve",

@@ -1,18 +1,26 @@
 import * as React from "react"
 import { graphql, Link } from "gatsby"
+import { GatsbyImage, getImage, IGatsbyImageData } from "gatsby-plugin-image"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 
+interface ThumbnailNode {
+  childImageSharp: {
+    gatsbyImageData: IGatsbyImageData
+  }
+}
+
 interface PostNode {
   id: string
-  parent?: { name?: string } | null
+  parent?: { name?: string; relativeDirectory?: string } | null
   frontmatter: {
     title?: string
     date?: string
     description?: string
     tags?: string[]
     author?: string
+    thumbnail?: ThumbnailNode
   }
   excerpt?: string
 }
@@ -28,7 +36,7 @@ interface IndexPageProps {
   location: { search?: string }
 }
 
-/* ── Category badge color map ──────────────────────── */
+/* ── Helpers ───────────────────────────────────────── */
 const categoryStyle: Record<string, string> = {
   Engineering: "bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400",
   Design: "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400",
@@ -42,7 +50,11 @@ const badgeClass = (tag: string) =>
     categoryStyle[tag] ?? "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
   }`
 
-/* ── Thumbnail placeholder ─────────────────────────── */
+const getPostSlug = (post: PostNode) => {
+  const dir = post.parent?.relativeDirectory
+  return dir ? `/blog/${dir}` : post.parent?.name ? `/blog/${post.parent.name}` : "/"
+}
+
 const thumbnailGradient: Record<string, string> = {
   Engineering: "from-slate-700 to-slate-900",
   Design: "from-emerald-400 to-teal-600",
@@ -51,43 +63,172 @@ const thumbnailGradient: Record<string, string> = {
   블로그: "from-violet-400 to-purple-600",
 }
 
-const ThumbnailPlaceholder = ({ tag }: { tag: string }) => {
-  const gradient = thumbnailGradient[tag] ?? "from-gray-300 to-gray-400"
+/* ── Featured Hero Carousel ────────────────────────── */
+const CAROUSEL_INTERVAL = 5000
+
+const FeaturedHero = ({ posts }: { posts: PostNode[] }) => {
+  const [current, setCurrent] = React.useState(0)
+  const [paused, setPaused] = React.useState(false)
+  const total = posts.length
+
+  React.useEffect(() => {
+    if (total <= 1 || paused) return
+    const timer = setInterval(() => {
+      setCurrent(c => (c + 1) % total)
+    }, CAROUSEL_INTERVAL)
+    return () => clearInterval(timer)
+  }, [total, paused])
+
+  if (total === 0) return null
+
   return (
-    <div
-      className={`w-32 h-24 rounded-xl bg-gradient-to-br ${gradient} flex-shrink-0 flex items-center justify-center overflow-hidden`}
+    <section
+      className="mb-14"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
     >
-      <span className="text-2xl select-none">
-        {tag === "Engineering" ? "⚙️" : tag === "Design" ? "🎨" : "📄"}
-      </span>
-    </div>
+      <div className="relative rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 h-60 sm:h-72 hover:shadow-xl transition-shadow duration-300">
+        {posts.map((post, i) => {
+          const { title, description, tags, author, date, thumbnail } = post.frontmatter
+          const tag = tags?.[0] ?? "일반"
+          const slug = getPostSlug(post)
+          const gradient = thumbnailGradient[tag] ?? "from-gray-500 to-gray-700"
+          const img = thumbnail ? getImage(thumbnail.childImageSharp.gatsbyImageData) : null
+          const isActive = i === current
+
+          return (
+            <div
+              key={post.id}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+              }`}
+              aria-hidden={!isActive}
+            >
+              <Link to={slug} className="group block w-full h-full">
+                <div className={`relative w-full h-full ${!img ? `bg-gradient-to-br ${gradient}` : ""}`}>
+                  {img ? (
+                    <GatsbyImage
+                      image={img}
+                      alt={title ?? ""}
+                      className="!absolute inset-0 w-full h-full group-hover:scale-[1.03] transition-transform duration-500"
+                      imgClassName="object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-6xl opacity-20 select-none">
+                        {tag === "Engineering" ? "⚙️" : tag === "Design" ? "🎨" : "📄"}
+                      </span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={badgeClass(tag)}>{tag}</span>
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white leading-snug tracking-tight line-clamp-2 group-hover:opacity-90 transition-opacity">
+                      {title ?? "제목 없음"}
+                    </h2>
+                    {(description || post.excerpt) && (
+                      <p className="text-sm text-white/70 mt-2 line-clamp-2 leading-relaxed">
+                        {description ?? post.excerpt}
+                      </p>
+                    )}
+                    {(author || date) && (
+                      <div className="flex items-center gap-1.5 mt-3 text-white/55 text-xs">
+                        {author && <span>{author}</span>}
+                        {author && date && <span>·</span>}
+                        {date && <span>{date}</span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            </div>
+          )
+        })}
+
+        {/* 이전/다음 버튼 */}
+        {total > 1 && (
+          <>
+            <button
+              onClick={() => setCurrent(c => (c - 1 + total) % total)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors backdrop-blur-sm"
+              aria-label="이전 슬라이드"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m15 18-6-6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setCurrent(c => (c + 1) % total)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors backdrop-blur-sm"
+              aria-label="다음 슬라이드"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m9 18 6-6-6-6" />
+              </svg>
+            </button>
+          </>
+        )}
+
+        {/* 도트 인디케이터 */}
+        {total > 1 && (
+          <div className="absolute bottom-4 right-6 z-20 flex items-center gap-1.5">
+            {posts.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                aria-label={`슬라이드 ${i + 1}`}
+                className={`rounded-full transition-all duration-300 ${
+                  i === current
+                    ? "w-5 h-1.5 bg-white"
+                    : "w-1.5 h-1.5 bg-white/45 hover:bg-white/70"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* 자동 재생 프로그레스 바 */}
+        {total > 1 && !paused && (
+          <div className="absolute bottom-0 left-0 right-0 h-[2px] z-20 bg-white/10">
+            <div
+              key={`${current}-progress`}
+              className="h-full bg-white/50 hero-progress"
+              style={{ animationDuration: `${CAROUSEL_INTERVAL}ms` }}
+            />
+          </div>
+        )}
+      </div>
+    </section>
   )
 }
 
 /* ── Article card ──────────────────────────────────── */
 const ArticleCard = ({ post }: { post: PostNode }) => {
-  const { title, date, description, tags, author } = post.frontmatter
+  const { title, date, description, tags, author, thumbnail } = post.frontmatter
   const tag = tags?.[0] ?? "일반"
-  const slug = post.parent?.name ? `/blog/${post.parent.name}` : "/"
+  const slug = getPostSlug(post)
+  const img = thumbnail ? getImage(thumbnail.childImageSharp.gatsbyImageData) : null
 
   return (
     <article className="border-b border-gray-100 dark:border-gray-800 last:border-0">
       <Link
         to={slug}
-        className="flex justify-between items-start gap-6 py-7 group -mx-4 px-4 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+        className="flex justify-between items-start gap-6 py-8 group -mx-4 px-4 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
       >
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <div className="flex items-center gap-2 mb-2.5 flex-wrap">
             <span className={badgeClass(tag)}>{tag}</span>
             {author && (
               <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">{author}</span>
             )}
           </div>
-          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             {title ?? "제목 없음"}
           </h3>
           {(description || post.excerpt) && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed">
+            <p className="text-sm text-gray-400 dark:text-gray-500 line-clamp-2 leading-relaxed">
               {description ?? post.excerpt}
             </p>
           )}
@@ -95,7 +236,16 @@ const ArticleCard = ({ post }: { post: PostNode }) => {
             <span className="text-xs text-gray-400 dark:text-gray-500 mt-3 block">{date}</span>
           )}
         </div>
-        <ThumbnailPlaceholder tag={tag} />
+        {img && (
+          <div className="w-44 h-[120px] rounded-xl flex-shrink-0 overflow-hidden">
+            <GatsbyImage
+              image={img}
+              alt={title ?? ""}
+              className="w-full h-full"
+              imgClassName="object-cover"
+            />
+          </div>
+        )}
       </Link>
     </article>
   )
@@ -118,7 +268,7 @@ const rankColor = [
 ]
 
 const PopularSidebar = ({ posts }: { posts: PostNode[] }) => (
-  <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-6">
+  <div className="bg-[#f5f5f7] dark:bg-gray-800/60 rounded-2xl p-5">
     <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-5">인기 있는 글</h3>
     <ol className="space-y-4 pl-0">
       {posts.slice(0, 3).map((post, i) => (
@@ -130,7 +280,7 @@ const PopularSidebar = ({ posts }: { posts: PostNode[] }) => (
           </span>
           <div className="min-w-0">
             <Link
-              to={post.parent?.name ? `/blog/${post.parent.name}` : "/"}
+              to={getPostSlug(post)}
               className="text-sm font-semibold text-gray-800 dark:text-gray-200 leading-snug line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
             >
               {post.frontmatter.title}
@@ -171,7 +321,7 @@ const RecentCommentsSidebar = () => {
   }, [])
 
   return (
-    <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-6">
+    <div className="bg-[#f5f5f7] dark:bg-gray-800/60 rounded-2xl p-5">
       <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-4">최신 댓글</h3>
 
       {loading && (
@@ -245,11 +395,15 @@ const IndexPage = ({ data, location }: IndexPageProps) => {
     : allPosts
 
   const pageTitle = activeCategory ? `${activeCategory}` : "전체 아티클"
+  const showHero = !activeCategory && posts.length > 0
 
   return (
     <Layout location={location}>
-      <div className="py-8">
-        <div className="flex items-center gap-3 mb-8">
+      <div className="py-14">
+        {/* Featured Hero — 카테고리 필터 없을 때만 표시, 최대 3개 */}
+        {showHero && <FeaturedHero posts={posts.slice(0, 3)} />}
+
+        <div className="flex items-center gap-3 mb-10">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
             {pageTitle}
           </h1>
@@ -309,6 +463,7 @@ export const query = graphql`
         parent {
           ... on File {
             name
+            relativeDirectory
           }
         }
         frontmatter {
@@ -317,6 +472,11 @@ export const query = graphql`
           description
           tags
           author
+          thumbnail {
+            childImageSharp {
+              gatsbyImageData(width: 800, placeholder: BLURRED, layout: CONSTRAINED, formats: [AUTO, WEBP, AVIF])
+            }
+          }
         }
         excerpt(pruneLength: 120)
       }

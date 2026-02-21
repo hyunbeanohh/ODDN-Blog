@@ -15,6 +15,7 @@ exports.createSchemaCustomization = ({ actions }) => {
       description: String
       tags: [String]
       author: String
+      thumbnail: File @fileByRelativePath
     }
   `)
 }
@@ -34,6 +35,7 @@ exports.createPages = async ({ graphql, actions }) => {
           parent {
             ... on File {
               name
+              relativeDirectory
             }
           }
         }
@@ -46,7 +48,8 @@ exports.createPages = async ({ graphql, actions }) => {
   }
 
   result.data.allMdx.nodes.forEach(node => {
-    const slug = `/blog/${node.parent.name}`
+    const dir = node.parent.relativeDirectory
+    const slug = dir ? `/blog/${dir}` : `/blog/${node.parent.name}`
     createPage({
       path: slug,
       component: `${blogPostTemplate}?__contentFilePath=${node.internal.contentFilePath}`,

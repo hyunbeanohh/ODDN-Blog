@@ -64,3 +64,20 @@ html.is-theme-transitioning *::after {
     transform: none !important;
   }
 }
+
+/* ── Hero 캐러셀 프로그레스 바 ───────────────────────── */
+@keyframes hero-progress {
+  from { width: 0% }
+  to   { width: 100% }
+}
+
+.hero-progress {
+  animation: hero-progress linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-progress {
+    animation: none;
+    width: 100%;
+  }
+}

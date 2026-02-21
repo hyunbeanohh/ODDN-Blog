@@ -1,5 +1,6 @@
 import * as React from "react"
 import { graphql, Link } from "gatsby"
+import { GatsbyImage, getImage, IGatsbyImageData } from "gatsby-plugin-image"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
@@ -107,6 +108,12 @@ const ProfilePopover = ({ onClose }: { onClose: () => void }) => {
 }
 
 /* ── Blog post template ────────────────────────────── */
+interface ThumbnailNode {
+  childImageSharp: {
+    gatsbyImageData: IGatsbyImageData
+  }
+}
+
 interface BlogPostData {
   mdx: {
     frontmatter: {
@@ -116,6 +123,7 @@ interface BlogPostData {
       description?: string
       tags?: string[]
       author?: string
+      thumbnail?: ThumbnailNode
     }
   }
 }
@@ -127,7 +135,7 @@ interface BlogPostProps {
 }
 
 const BlogPost = ({ data, children, location }: BlogPostProps) => {
-  const { title, date, description, tags, author } = data.mdx.frontmatter
+  const { title, date, description, tags, author, thumbnail } = data.mdx.frontmatter
   const [popoverOpen, setPopoverOpen] = React.useState(false)
 
   return (
@@ -189,6 +197,18 @@ const BlogPost = ({ data, children, location }: BlogPostProps) => {
               </div>
             </div>
           </header>
+
+          {/* Thumbnail */}
+          {thumbnail && (() => {
+            const img = getImage(thumbnail.childImageSharp.gatsbyImageData)
+            return img ? (
+              <GatsbyImage
+                image={img}
+                alt={title ?? ""}
+                className="w-full rounded-2xl mb-10 max-h-80"
+              />
+            ) : null
+          })()}
 
           {/* MDX Content */}
           <div className="prose prose-gray max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-purple-700 dark:prose-code:text-purple-300 prose-code:bg-purple-50 dark:prose-code:bg-purple-950/30 prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-pre:bg-gray-900 prose-blockquote:border-purple-300 dark:prose-blockquote:border-purple-700">
@@ -255,6 +275,11 @@ export const query = graphql`
         description
         tags
         author
+        thumbnail {
+          childImageSharp {
+            gatsbyImageData(width: 800, placeholder: BLURRED, formats: [AUTO, WEBP, AVIF])
+          }
+        }
       }
     }
   }

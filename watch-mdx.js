@@ -54,15 +54,20 @@ function scheduleRestart(filePath) {
 }
 
 // MDX 파일 감시
-const watcher = chokidar.watch(path.join(ROOT, "content/**/*.mdx"), {
+const watcher = chokidar.watch(path.join(ROOT, "content/**/*.{md,mdx}"), {
   ignoreInitial: true,
   persistent: true,
 })
 
-watcher.on("change", scheduleRestart)
-watcher.on("add", scheduleRestart)
+// rename is reported as unlink + add, so handle both consistently.
+const restartEvents = new Set(["add", "change", "unlink", "addDir", "unlinkDir"])
 
-log("MDX 파일 감시를 시작합니다. (content/**/*.mdx)")
+watcher.on("all", (event, filePath) => {
+  if (!restartEvents.has(event)) return
+  scheduleRestart(filePath)
+})
+
+log("콘텐츠 파일 감시를 시작합니다. (content/**/*.{md,mdx})")
 
 // 최초 gatsby develop 실행
 startGatsby()

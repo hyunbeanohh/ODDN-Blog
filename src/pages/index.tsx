@@ -225,22 +225,21 @@ const ArticleCard = ({ post }: { post: PostNode }) => {
   const tag = tags?.[0] ?? "일반"
   const slug = getPostSlug(post)
   const img = thumbnail ? getImage(thumbnail.childImageSharp.gatsbyImageData) : null
+  const cardClassName =
+    "flex justify-between items-start gap-6 py-8 group -mx-4 px-4 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
 
   return (
     <article className="border-b border-gray-100 dark:border-gray-800 last:border-0">
-      <Link
-        to={slug}
-        className="flex justify-between items-start gap-6 py-8 group -mx-4 px-4 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
-      >
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2.5 flex-wrap">
-            <span className={badgeClass(tag)}>{tag}</span>
-            {author && (
-              <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">{author}</span>
-            )}
-          </div>
-          <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-            {draft && (
+      {draft ? (
+        <div className={`${cardClassName} cursor-default`} aria-disabled="true">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2.5 flex-wrap">
+              <span className={badgeClass(tag)}>{tag}</span>
+              {author && (
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">{author}</span>
+              )}
+            </div>
+            <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               <svg
                 width="16"
                 height="16"
@@ -256,31 +255,63 @@ const ArticleCard = ({ post }: { post: PostNode }) => {
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
+              {title ?? "제목 없음"}
+            </h3>
+            {(description || post.excerpt) && (
+              <p className="text-sm text-gray-400 dark:text-gray-500 line-clamp-2 leading-relaxed">
+                {description ?? post.excerpt}
+              </p>
             )}
-            {title ?? "제목 없음"}
-          </h3>
-          {(description || post.excerpt) && (
-            <p className="text-sm text-gray-400 dark:text-gray-500 line-clamp-2 leading-relaxed">
-              {description ?? post.excerpt}
-            </p>
-          )}
-          {date && (
-            <span className="text-xs text-gray-400 dark:text-gray-500 mt-3 block">{date}</span>
+            {date && (
+              <span className="text-xs text-gray-400 dark:text-gray-500 mt-3 block">{date}</span>
+            )}
+          </div>
+          {img ? (
+            <div className="w-44 h-[120px] rounded-xl flex-shrink-0 overflow-hidden">
+              <GatsbyImage
+                image={img}
+                alt={title ?? ""}
+                className="w-full h-full"
+                imgClassName="object-cover"
+              />
+            </div>
+          ) : (
+            <DraftThumbnailPlaceholder />
           )}
         </div>
-        {img ? (
-          <div className="w-44 h-[120px] rounded-xl flex-shrink-0 overflow-hidden">
-            <GatsbyImage
-              image={img}
-              alt={title ?? ""}
-              className="w-full h-full"
-              imgClassName="object-cover"
-            />
+      ) : (
+        <Link to={slug} className={cardClassName}>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2.5 flex-wrap">
+              <span className={badgeClass(tag)}>{tag}</span>
+              {author && (
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">{author}</span>
+              )}
+            </div>
+            <h3 className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 leading-snug tracking-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              {title ?? "제목 없음"}
+            </h3>
+            {(description || post.excerpt) && (
+              <p className="text-sm text-gray-400 dark:text-gray-500 line-clamp-2 leading-relaxed">
+                {description ?? post.excerpt}
+              </p>
+            )}
+            {date && (
+              <span className="text-xs text-gray-400 dark:text-gray-500 mt-3 block">{date}</span>
+            )}
           </div>
-        ) : draft ? (
-          <DraftThumbnailPlaceholder />
-        ) : null}
-      </Link>
+          {img ? (
+            <div className="w-44 h-[120px] rounded-xl flex-shrink-0 overflow-hidden">
+              <GatsbyImage
+                image={img}
+                alt={title ?? ""}
+                className="w-full h-full"
+                imgClassName="object-cover"
+              />
+            </div>
+          ) : null}
+        </Link>
+      )}
     </article>
   )
 }

@@ -5,6 +5,7 @@ import { GatsbyImage, getImage, IGatsbyImageData } from "gatsby-plugin-image"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Comments from "../components/comments"
+import TableOfContents from "../components/table-of-contents"
 
 const SOCIAL_LINKS = {
   github: "https://github.com/hyunbeanohh",
@@ -167,11 +168,13 @@ const BlogPost = ({ data, children, location, pageContext }: BlogPostProps) => {
   const { title, date, description, tags, author, thumbnail } = data.mdx.frontmatter
   const { isDraft } = pageContext
   const [popoverOpen, setPopoverOpen] = React.useState(false)
+  const contentRef = React.useRef<HTMLDivElement>(null)
 
   return (
     <Layout location={location}>
       <div className="py-10">
-        <div className="max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_18rem] gap-10 items-start">
+          <article className="max-w-2xl w-full mx-auto min-w-0">
           {/* Back link */}
           <Link
             to={isDraft ? "/draft" : "/"}
@@ -271,13 +274,19 @@ const BlogPost = ({ data, children, location, pageContext }: BlogPostProps) => {
           })()}
 
           {/* MDX Content */}
-          <div className="prose prose-gray max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-purple-700 dark:prose-code:text-purple-300 prose-code:bg-purple-50 dark:prose-code:bg-purple-950/30 prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-pre:bg-gray-900 prose-blockquote:border-purple-300 dark:prose-blockquote:border-purple-700">
+          <div
+            ref={contentRef}
+            className="prose prose-gray max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-purple-700 dark:prose-code:text-purple-300 prose-code:bg-purple-50 dark:prose-code:bg-purple-950/30 prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-pre:bg-gray-900 prose-blockquote:border-purple-300 dark:prose-blockquote:border-purple-700"
+          >
             {children}
           </div>
 
           <hr className="my-14 border-gray-100 dark:border-gray-800" />
 
           <Comments />
+          </article>
+
+          <TableOfContents contentRef={contentRef} />
         </div>
       </div>
     </Layout>

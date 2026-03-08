@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 /* ── 테마 전환 트랜지션 ─────────────────────────────── */
 /* 토글 버튼 클릭 시에만 일시적으로 모든 요소에 트랜지션 적용 */
 html.is-theme-transitioning *,

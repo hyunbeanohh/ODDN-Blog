@@ -3,6 +3,7 @@
  *
  * See: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
  */
+const rehypePrettyCode = require("rehype-pretty-code").default
 
 /**
  * @type {import('gatsby').GatsbyConfig}
@@ -48,6 +49,20 @@ module.exports = {
       resolve: `gatsby-plugin-mdx`,
       options: {
         extensions: [`.mdx`, `.md`],
+        mdxOptions: {
+          rehypePlugins: [
+            [
+              rehypePrettyCode,
+              {
+                theme: {
+                  light: "github-light",
+                  dark: "github-dark",
+                },
+                keepBackground: false,
+              },
+            ],
+          ],
+        },
         gatsbyRemarkPlugins: [
           {
             resolve: `gatsby-remark-images`,

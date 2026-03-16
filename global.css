@@ -91,3 +91,106 @@ html.is-theme-transitioning *::after {
     width: 100%;
   }
 }
+
+/* ── MDX code block polish (rehype-pretty-code) ─────────────── */
+[data-rehype-pretty-code-fragment] {
+  margin: 1.5rem 0;
+}
+
+[data-rehype-pretty-code-title] {
+  margin: 0;
+  padding: 0.5rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-bottom: 0;
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: #f8fafc;
+  color: #475569;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+[data-rehype-pretty-code-fragment] pre {
+  margin: 0;
+  padding: 1rem 1.125rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  overflow-x: auto;
+}
+
+[data-rehype-pretty-code-title] + pre {
+  border-radius: 0 0 0.75rem 0.75rem;
+}
+
+[data-rehype-pretty-code-fragment] code {
+  background: transparent !important;
+  border-radius: 0;
+  padding: 0;
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+[data-theme="dark"] [data-rehype-pretty-code-title] {
+  border-color: #334155;
+  background: #0f172a;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] [data-rehype-pretty-code-fragment] pre {
+  border-color: #334155;
+  background: #0f172a;
+}
+
+/* Inline code only (exclude fenced code blocks) */
+.prose :not(pre) > code {
+  background-color: #f1f5f9;
+  color: #334155;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.375rem;
+}
+
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: none;
+}
+
+[data-theme="dark"] .prose :not(pre) > code {
+  background-color: #1f2937;
+  color: #d1d5db;
+}
+
+/* MDX list polish */
+.prose ul,
+.prose ol {
+  margin: 1rem 0;
+  padding-left: 1.35rem;
+}
+
+.prose li {
+  margin: 0.42rem 0;
+  padding-left: 0.1rem;
+  line-height: 1.75;
+}
+
+.prose ul {
+  list-style-type: disc;
+}
+
+.prose ul ul {
+  list-style-type: circle;
+  margin: 0.4rem 0 0.2rem;
+}
+
+.prose ol {
+  list-style-type: decimal;
+}
+
+.prose li::marker {
+  color: #64748b;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .prose li::marker {
+  color: #94a3b8;
+}

@@ -1,37 +1,188 @@
 ---
-title: "TDD(테스트 주도 개발) 알아보기"
-date: "2026-03-03"
-description: TDD(테스트 주도 개발)이 무엇인지 알아보고 왜 필요한지 알아봅니다.
-tags: ["Engineering"]
+title: "oh-my-opencode란?"
+date: "2026-03-16"
+description: oh-my-opencode가 무엇인지와 CLI 명령별 역할, 실제 사용 흐름을 정리합니다.
+tags: ["Engineering", "AI"]
 author: 오또니
-draft: true
 ---
 
-이 글은 **임시 저장** 상태입니다. 관리자만 볼 수 있습니다.
+## 1. 개념 정의
 
-## 확인 사항
+**oh-my-opencode**는 OpenCode CLI 환경을 확장하고 자동화하기 위한 **커뮤니티 기반 설정 프레임워크**입니다.
+개발자가 CLI 기반 AI 코딩 도구(OpenCode)를 더 강력하게 활용할 수 있도록 돕는 **환경 레이어**로 볼 수 있습니다.
 
-- [ ] 홈페이지 목록에 표시되지 않음
-- [ ] `/draft/draft-test` 경로로 접근 가능
-- [ ] 상단에 "임시 저장된 글입니다" 배너 표시
-- [ ] 고정 썸네일 (회색 그라디언트) 표시
-- [ ] DRAFT 배지 표시
-
-## Draft 기능 설계
-    
-임시 글은 `frontmatter`에 `draft: true`를 추가하면 자동으로:
-
-1. 빌드 시 `/draft/{slug}` 경로로 생성됩니다.
-2. 홈페이지 목록에서 제외됩니다.
-3. Netlify Edge Function이 비밀번호 인증을 요구합니다.
-
-```yaml
----
-title: 내 글 제목
-draft: true
----
+```text title="OpenCode CLI Layer"
+OpenCode CLI
+   ↑
+oh-my-opencode (환경 확장 레이어)
+   ↑
+사용자 프로젝트
 ```
 
+### 주요 목적
+
+- CLI 기반 AI 코딩 환경 자동화
+- 프로젝트 컨텍스트 이해 강화
+- 반복 설정을 preset 형태로 관리
+
 ---
 
-임시 저장 기능 구현 완료!
+## 2. 왜 만들어졌을까?
+
+OpenCode CLI를 기본 상태로만 사용할 때 자주 발생하는 문제는 다음과 같습니다.
+
+| 문제 | 설명 |
+|---|---|
+| 프로젝트 컨텍스트 부족 | 코드베이스 이해가 약함 |
+| 반복 설정 | 프로젝트마다 규칙(rule) 재작성 필요 |
+| 도구 연동 부족 | LSP / design / analysis 연동 한계 |
+| 자동화 부족 | agent pipeline 부재 |
+
+이를 보완하기 위해 oh-my-opencode가 등장했습니다.
+
+### 역할
+
+- OpenCode CLI
+- + 프로젝트 규칙
+- + 도구 플러그인
+- + 인덱싱
+- + 자동화 룰
+
+---
+
+## 3. 구성 요소
+
+### 3.1 CLI 명령 확장
+
+예: `/init`, `/index`, `/context`, `/agent`
+특히 `/init`이 가장 많이 사용됩니다.
+
+### 3.2 프로젝트 컨텍스트 시스템
+
+보통 프로젝트 루트에 아래 파일들이 생성됩니다.
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `PROJECT.md`
+- `RULES.md`
+
+| 파일 | 역할 |
+|---|---|
+| `AGENTS.md` | AI agent 규칙 |
+| `CLAUDE.md` | Claude 동작 정책 |
+| `PROJECT.md` | 프로젝트 설명 |
+| `RULES.md` | 코딩 규칙 |
+
+AI는 코드 분석 시 이 파일들을 컨텍스트로 활용합니다.
+
+### 3.3 프로젝트 인덱싱
+
+oh-my-opencode는 프로젝트를 인덱싱하여 작업 정확도를 높입니다.
+
+예:
+
+- symbol index
+- dependency graph
+- file structure
+
+덕분에 다음 작업이 더 정확해집니다.
+
+- find references
+- find symbol
+- rename
+
+### 3.4 CLI 명령별 역할 상세
+
+<table>
+  <thead>
+    <tr>
+      <th>명령</th>
+      <th>역할</th>
+      <th>주 사용 시점</th>
+      <th>결과</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/init</code></td>
+      <td>프로젝트 초기 설정 수행</td>
+      <td>새 프로젝트 연결 직후</td>
+      <td>컨텍스트 파일(예: <code>AGENTS.md</code>, <code>PROJECT.md</code>) 생성, 기본 규칙 세팅</td>
+    </tr>
+    <tr>
+      <td><code>/index</code></td>
+      <td>코드베이스 인덱싱</td>
+      <td>초기화 후, 대규모 변경 후</td>
+      <td>심볼/의존성/파일 구조 인덱스 갱신, 검색·참조 정확도 향상</td>
+    </tr>
+    <tr>
+      <td><code>/context</code></td>
+      <td>AI가 읽을 프로젝트 컨텍스트 관리</td>
+      <td>규칙 수정, 문서 업데이트 시</td>
+      <td>현재 프로젝트 정책/구조/제약사항을 컨텍스트로 반영</td>
+    </tr>
+    <tr>
+      <td><code>/agent</code></td>
+      <td>에이전트 실행/자동화 파이프라인 트리거</td>
+      <td>실제 작업(리팩터링, 분석, 생성) 시</td>
+      <td>지정된 규칙 + 컨텍스트 기반 작업 수행</td>
+    </tr>
+  </tbody>
+</table>
+
+#### 명령 간 권장 순서
+
+1. `/init`
+2. `/index`
+3. `/context` (필요 시 갱신)
+4. `/agent` (실제 작업 실행)
+
+#### 실무 팁
+
+- 코드 구조가 크게 바뀌면 `/index`를 다시 실행해 정확도를 유지합니다.
+- 규칙 파일(`AGENTS.md`, `RULES.md`)을 수정했다면 `/context`로 재반영한 뒤 `/agent`를 실행하는 것이 안전합니다.
+
+---
+
+## 4. 실제 사용 흐름
+
+### 1) 프로젝트 이동
+
+```bash
+cd my-project
+```
+
+### 2) 초기화
+
+```bash
+/init
+```
+
+실행 결과(예):
+
+- `AGENTS.md`
+- `CLAUDE.md`
+- `PROJECT.md` 생성
+
+### 3) 인덱싱
+
+```bash
+/index
+```
+
+### 4) 코드 작업
+
+예: `refactor editor module`
+
+AI는 다음 정보를 기반으로 작업합니다.
+
+- `AGENTS.md`
+- `PROJECT.md`
+- index 데이터
+- 실제 코드베이스
+
+---
+
+## 한 줄 요약
+
+**oh-my-opencode는 OpenCode CLI에 컨텍스트·인덱싱·자동화를 더해, 프로젝트 단위 AI 코딩 생산성을 높여주는 확장 프레임워크입니다.**

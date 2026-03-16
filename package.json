@@ -18,7 +18,9 @@
     "gatsby-source-filesystem": "^5.16.0",
     "gatsby-transformer-sharp": "^5.16.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "rehype-pretty-code": "^0.14.3",
+    "shiki": "^4.0.2"
   },
   "devDependencies": {
     "@netlify/edge-functions": "^3.0.3",

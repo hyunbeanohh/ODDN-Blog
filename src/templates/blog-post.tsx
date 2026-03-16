@@ -276,7 +276,7 @@ const BlogPost = ({ data, children, location, pageContext }: BlogPostProps) => {
           {/* MDX Content */}
           <div
             ref={contentRef}
-            className="prose prose-gray max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-code:text-purple-700 dark:prose-code:text-purple-300 prose-code:bg-purple-50 dark:prose-code:bg-purple-950/30 prose-code:rounded prose-code:px-1 prose-code:py-0.5 prose-pre:bg-gray-900 prose-blockquote:border-purple-300 dark:prose-blockquote:border-purple-700"
+            className="prose prose-gray max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-blockquote:border-purple-300 dark:prose-blockquote:border-purple-700"
           >
             {children}
           </div>

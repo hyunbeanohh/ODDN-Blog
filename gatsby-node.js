@@ -44,6 +44,7 @@ exports.createSchemaCustomization = ({ actions }) => {
       date: Date @dateformat
       description: String
       tags: [String]
+      references: [String]
       author: String
       thumbnail: File @fileByRelativePath
       draft: Boolean

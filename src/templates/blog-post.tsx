@@ -123,6 +123,7 @@ interface BlogPostData {
       dateRaw?: string
       description?: string
       tags?: string[]
+      references?: string[]
       author?: string
       thumbnail?: ThumbnailNode
       draft?: boolean
@@ -209,10 +210,14 @@ const formatLastModified = (value?: string) => {
   return `${year}년 ${month}월 ${day}일 ${isAm ? "오전" : "오후"} ${hour12}:${minute}`
 }
 
+const getReferenceCount = (references?: string[]) =>
+  references?.filter(reference => reference.trim().length > 0).length ?? 0
+
 const BlogPost = ({ data, children, location, pageContext }: BlogPostProps) => {
-  const { title, date, description, tags, author, thumbnail } = data.mdx.frontmatter
+  const { title, date, description, tags, references, author, thumbnail } = data.mdx.frontmatter
   const lastModifiedText = formatLastModified(data.mdx.parent?.modifiedTimeRaw)
   const { isDraft, readingTime } = pageContext
+  const referenceCount = getReferenceCount(references)
   const [popoverOpen, setPopoverOpen] = React.useState(false)
   const contentRef = React.useRef<HTMLDivElement>(null)
   const tocRailRef = React.useRef<HTMLDivElement>(null)
@@ -305,7 +310,7 @@ const BlogPost = ({ data, children, location, pageContext }: BlogPostProps) => {
               </div>
             </div>
 
-            {(lastModifiedText || readingTime) && (
+            {(lastModifiedText || readingTime || referenceCount > 0) && (
               <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
                 <div className="grid gap-y-2 text-[0.8125rem] sm:text-sm">
                   {lastModifiedText && (
@@ -352,6 +357,31 @@ const BlogPost = ({ data, children, location, pageContext }: BlogPostProps) => {
                         <span className="font-medium">읽는 시간</span>
                       </div>
                       <p className="m-0 text-gray-700 dark:text-gray-200">{readingTime}분</p>
+                    </div>
+                  )}
+                  {referenceCount > 0 && (
+                    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1">
+                      <div className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                          <line x1="9" y1="7" x2="17" y2="7" />
+                          <line x1="9" y1="11" x2="17" y2="11" />
+                          <line x1="9" y1="15" x2="14" y2="15" />
+                        </svg>
+                        <span className="font-medium">레퍼런스</span>
+                      </div>
+                      <p className="m-0 text-gray-700 dark:text-gray-200">{referenceCount}개</p>
                     </div>
                   )}
                 </div>
@@ -445,6 +475,7 @@ export const query = graphql`
         dateRaw: date
         description
         tags
+        references
         author
         draft
         thumbnail {

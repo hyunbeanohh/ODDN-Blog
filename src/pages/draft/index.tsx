@@ -148,7 +148,7 @@ const DraftIndexPage = ({ data, location }: DraftIndexPageProps) => {
           </span>
         </div>
         <p className="text-sm text-gray-400 dark:text-gray-500 mb-10">
-          관리자만 볼 수 있는 임시 저장 글입니다.
+          임시 저장 상태의 글 목록입니다.
         </p>
 
         {posts.length === 0 ? (

@@ -1,6 +1,8 @@
 /**
- * MDX 파일 변경 감지 시 gatsby clean && gatsby develop 자동 실행
- * 사용법: npm run develop:watch
+ * MDX 파일 변경 감지 시 gatsby develop 자동 실행
+ * 사용법:
+ *   npm run dev:watch        // 빠른 재시작 (기본)
+ *   npm run dev:watch:clean  // 매 재시작 전에 clean 수행
  */
 
 const chokidar = require("chokidar")
@@ -8,6 +10,7 @@ const { execSync, spawn } = require("child_process")
 const path = require("path")
 
 const ROOT = __dirname
+const shouldClean = process.argv.includes("--clean")
 let gatsbyProcess = null
 let debounceTimer = null
 
@@ -23,11 +26,13 @@ function startGatsby() {
     gatsbyProcess = null
   }
 
-  log("gatsby clean 실행 중...")
-  try {
-    execSync("npx gatsby clean", { stdio: "inherit", cwd: ROOT })
-  } catch {
-    // clean 실패 시에도 develop 재시도
+  if (shouldClean) {
+    log("gatsby clean 실행 중...")
+    try {
+      execSync("npx gatsby clean", { stdio: "inherit", cwd: ROOT })
+    } catch {
+      // clean 실패 시에도 develop 재시도
+    }
   }
 
   log("gatsby develop 시작 중...")

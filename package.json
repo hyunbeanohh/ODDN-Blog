@@ -54,6 +54,7 @@
     "build:ci": "node scripts/generate-content-index.js && gatsby build",
     "dev": "gatsby develop",
     "dev:watch": "node watch-mdx.js",
+    "dev:watch:clean": "node watch-mdx.js --clean",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "start": "gatsby develop",
     "serve": "gatsby serve",

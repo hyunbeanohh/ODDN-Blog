@@ -53,6 +53,7 @@ exports.createSchemaCustomization = ({ actions }) => {
       author: String
       thumbnail: File @fileByRelativePath
       draft: Boolean
+      inProgress: Boolean
     }
   `)
 }

@@ -22,6 +22,7 @@ interface PostNode {
     author?: string
     thumbnail?: ThumbnailNode
     draft?: boolean
+    inProgress?: boolean
   }
   excerpt?: string
 }
@@ -221,15 +222,22 @@ const DraftThumbnailPlaceholder = () => (
 
 /* ── Article card ──────────────────────────────────── */
 const ArticleCard = ({ post }: { post: PostNode }) => {
-  const { title, date, description, tags, author, thumbnail, draft } = post.frontmatter
+  const { title, date, description, tags, author, thumbnail, draft, inProgress } = post.frontmatter
   const tag = tags?.[0] ?? "일반"
   const slug = getPostSlug(post)
   const img = thumbnail ? getImage(thumbnail.childImageSharp.gatsbyImageData) : null
   const cardClassName =
     "flex justify-between items-start gap-6 py-8 group -mx-4 px-4 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
+  const inProgressBadgeClassName =
+    "absolute top-0 right-0 z-10 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-bl-xl"
 
   return (
-    <article className="border-b border-gray-100 dark:border-gray-800 last:border-0">
+    <article className="relative border-b border-gray-100 dark:border-gray-800 last:border-0">
+      {inProgress && (
+        <span className={inProgressBadgeClassName}>
+          작성중
+        </span>
+      )}
       {draft ? (
         <div className={`${cardClassName} cursor-default`} aria-disabled="true">
           <div className="flex-1 min-w-0">
@@ -546,6 +554,7 @@ export const query = graphql`
           tags
           author
           draft
+          inProgress
           thumbnail {
             childImageSharp {
               gatsbyImageData(width: 800, placeholder: BLURRED, layout: CONSTRAINED, formats: [AUTO, WEBP, AVIF])

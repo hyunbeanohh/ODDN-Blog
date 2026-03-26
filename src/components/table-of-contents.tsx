@@ -32,7 +32,7 @@ const slugify = (value: string): string =>
     .replace(/-+/g, "-")
 
 const HEADER_HEIGHT = 60
-const DESKTOP_FLOAT_TOP_GAP = 24
+const DESKTOP_FLOAT_TOP_GAP = 120
 const DESKTOP_FLOAT_TOP = HEADER_HEIGHT + DESKTOP_FLOAT_TOP_GAP
 const DESKTOP_MIN_WIDTH = 1024
 

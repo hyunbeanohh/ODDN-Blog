@@ -32,10 +32,10 @@ nvm use
 npm install
 
 # 개발 서버 실행 (http://localhost:8000)
-npm run develop
+npm run dev
 
 # MDX 파일 변경 감지와 함께 개발 서버 실행
-npm run develop:watch
+npm run dev:watch
 
 # 프로덕션 빌드
 npm run build

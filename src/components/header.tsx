@@ -20,6 +20,16 @@ interface SearchablePost {
   searchableText: string
 }
 
+interface SemanticSearchResult {
+  id: string
+  slug: string
+  title: string
+  excerpt?: string
+  content?: string
+  score?: number
+  source?: string
+}
+
 /* ── SVG icons ─────────────────────────────────────── */
 const SearchIcon = ({ className = "" }: { className?: string }) => (
   <svg
@@ -140,6 +150,8 @@ const Header = ({ siteTitle, location }: HeaderProps) => {
   const [searchOpen, setSearchOpen] = React.useState(false)
   const [searchInput, setSearchInput] = React.useState("")
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [semanticResults, setSemanticResults] = React.useState<SemanticSearchResult[]>([])
+  const [semanticLoading, setSemanticLoading] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   const activePath = location?.pathname ?? "/"
@@ -168,6 +180,48 @@ const Header = ({ siteTitle, location }: HeaderProps) => {
   }, [searchQuery, searchablePosts])
 
   React.useEffect(() => {
+    const query = searchQuery.trim()
+
+    if (query.length < 2) {
+      setSemanticResults([])
+      setSemanticLoading(false)
+      return
+    }
+
+    let active = true
+    setSemanticLoading(true)
+
+    fetch("/api/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ query }),
+    })
+      .then(async response => {
+        if (!response.ok) {
+          throw new Error("search failed")
+        }
+
+        return response.json()
+      })
+      .then(data => {
+        if (!active) return
+        setSemanticResults(Array.isArray(data.results) ? data.results : [])
+        setSemanticLoading(false)
+      })
+      .catch(() => {
+        if (!active) return
+        setSemanticResults([])
+        setSemanticLoading(false)
+      })
+
+    return () => {
+      active = false
+    }
+  }, [searchQuery])
+
+  React.useEffect(() => {
     if (!searchOpen) return
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeSearch()
@@ -185,7 +239,21 @@ const Header = ({ siteTitle, location }: HeaderProps) => {
     setSearchOpen(false)
     setSearchInput("")
     setSearchQuery("")
+    setSemanticResults([])
+    setSemanticLoading(false)
   }
+
+  const semanticLinks = React.useMemo(() => {
+    const seen = new Set<string>()
+
+    return semanticResults
+      .filter(result => {
+        if (!result.slug || seen.has(result.slug)) return false
+        seen.add(result.slug)
+        return true
+      })
+      .slice(0, 4)
+  }, [semanticResults])
 
   /* ── icon button base classes ── */
   const iconBtnCls =
@@ -309,33 +377,85 @@ const Header = ({ siteTitle, location }: HeaderProps) => {
             </div>
 
             {/* Search results */}
-            {searchResults.length > 0 ? (
-              <ul className="max-h-72 overflow-y-auto py-2 m-0 list-none">
-                {searchResults.map(post => (
-                  <li key={post.id}>
-                    <Link
-                      to={getPostSlug(post)}
-                      onClick={closeSearch}
-                      className="w-full text-left px-5 py-3 block hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-                    >
-                      <p className="text-[0.9375rem] font-semibold text-gray-900 dark:text-gray-100 m-0">
-                        {post.frontmatter.title}
-                      </p>
-                      {post.excerpt && (
-                        <p className="text-[0.8125rem] text-gray-500 dark:text-gray-400 mt-0.5 mb-0 line-clamp-1">
-                          {post.excerpt}
-                        </p>
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : searchInput.trim() ? (
-              <div className="py-10 px-6 text-center text-sm text-gray-400 dark:text-gray-500">
-                <span className="text-gray-900 dark:text-gray-100 font-semibold">
-                  &ldquo;{searchInput}&rdquo;
-                </span>
-                에 대한 결과가 없습니다.
+            {searchInput.trim() ? (
+              <div className="max-h-[28rem] overflow-y-auto">
+                {semanticLoading && (
+                  <div className="px-5 pt-4 text-xs font-medium uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
+                    Cloudflare semantic search
+                  </div>
+                )}
+
+                {!semanticLoading && semanticLinks.length > 0 && (
+                  <>
+                    <div className="px-5 pt-4 text-xs font-medium uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
+                      Cloudflare semantic search
+                    </div>
+                    <ul className="py-2 m-0 list-none">
+                      {semanticLinks.map(result => (
+                        <li key={result.id || result.slug}>
+                          <Link
+                            to={result.slug}
+                            onClick={closeSearch}
+                            className="w-full text-left px-5 py-3 block hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              <p className="text-[0.9375rem] font-semibold text-gray-900 dark:text-gray-100 m-0">
+                                {result.title}
+                              </p>
+                              {result.source === "semantic" && (
+                                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[0.625rem] font-semibold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                                  semantic
+                                </span>
+                              )}
+                            </div>
+                            {(result.content || result.excerpt) && (
+                              <p className="text-[0.8125rem] text-gray-500 dark:text-gray-400 mt-0.5 mb-0 line-clamp-2">
+                                {result.content || result.excerpt}
+                              </p>
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {searchResults.length > 0 && (
+                  <>
+                    <div className="px-5 pt-2 text-xs font-medium uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">
+                      Local title search
+                    </div>
+                    <ul className="py-2 m-0 list-none">
+                      {searchResults.map(post => (
+                        <li key={post.id}>
+                          <Link
+                            to={getPostSlug(post)}
+                            onClick={closeSearch}
+                            className="w-full text-left px-5 py-3 block hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                          >
+                            <p className="text-[0.9375rem] font-semibold text-gray-900 dark:text-gray-100 m-0">
+                              {post.frontmatter.title}
+                            </p>
+                            {post.excerpt && (
+                              <p className="text-[0.8125rem] text-gray-500 dark:text-gray-400 mt-0.5 mb-0 line-clamp-1">
+                                {post.excerpt}
+                              </p>
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+
+                {!semanticLoading && semanticLinks.length === 0 && searchResults.length === 0 && (
+                  <div className="py-10 px-6 text-center text-sm text-gray-400 dark:text-gray-500">
+                    <span className="text-gray-900 dark:text-gray-100 font-semibold">
+                      &ldquo;{searchInput}&rdquo;
+                    </span>
+                    에 대한 결과가 없습니다.
+                  </div>
+                )}
               </div>
             ) : (
               <div className="py-10 px-6 text-center text-sm text-gray-400 dark:text-gray-500">

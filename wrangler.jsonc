@@ -1,0 +1,29 @@
+{
+  "name": "my-blog",
+  "main": "worker/src/index.ts",
+  "compatibility_date": "2026-04-13",
+  "assets": {
+    "directory": "./public"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-blog",
+      "database_id": "replace-with-your-d1-database-id"
+    }
+  ],
+  "vectorize": [
+    {
+      "binding": "BLOG_SEARCH_INDEX",
+      "index_name": "my-blog-search"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    "GISCUS_REPO": "hyunbeanohh/ODDN-Blog",
+    "GISCUS_CATEGORY_ID": "DIC_kwDORTJuH84C2ttM",
+    "SEMANTIC_SEARCH_MODEL": "@cf/baai/bge-m3"
+  }
+}

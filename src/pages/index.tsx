@@ -191,7 +191,7 @@ const RecentCommentsSidebar = () => {
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
-    fetch("/.netlify/functions/recent-comments")
+    fetch("/api/recent-comments")
       .then(res => res.json())
       .then(data => {
         setComments(data.comments ?? [])

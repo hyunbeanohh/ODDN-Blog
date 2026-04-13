@@ -1,6 +1,7 @@
 import * as React from "react"
 import Giscus from "@giscus/react"
 import { useTheme } from "../context/ThemeContext"
+import NativeComments from "./native-comments"
 
 /**
  * Giscus 댓글 컴포넌트 (GitHub Discussions 기반)
@@ -23,12 +24,22 @@ const GISCUS_CONFIG = {
   categoryId: process.env.GATSBY_GISCUS_CATEGORY_ID || "",
 }
 
-const Comments = () => {
+const COMMENTS_PROVIDER = process.env.GATSBY_COMMENTS_PROVIDER || "giscus"
+
+interface CommentsProps {
+  slug: string
+}
+
+const Comments = ({ slug }: CommentsProps) => {
   const { theme } = useTheme()
   const isConfigured =
     GISCUS_CONFIG.repo !== "owner/repo" &&
     GISCUS_CONFIG.repoId !== "" &&
     GISCUS_CONFIG.categoryId !== ""
+
+  if (COMMENTS_PROVIDER === "cloudflare") {
+    return <NativeComments slug={slug} />
+  }
 
   if (!isConfigured) {
     return (

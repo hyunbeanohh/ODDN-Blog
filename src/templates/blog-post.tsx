@@ -5,6 +5,7 @@ import { GatsbyImage, getImage, IGatsbyImageData } from "gatsby-plugin-image"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import Comments from "../components/comments"
+import PostReactions from "../components/post-reactions"
 import TableOfContents from "../components/table-of-contents"
 import { badgeClass } from "../utils/posts"
 
@@ -442,7 +443,8 @@ const BlogPost = ({ data, children, location, pageContext }: BlogPostProps) => {
 
           <hr className="my-14 border-gray-100 dark:border-gray-800" />
 
-          <Comments />
+          <PostReactions slug={location.pathname} />
+          <Comments slug={location.pathname} />
           </article>
 
           <div ref={tocRailRef} className="relative lg:self-stretch xl:col-start-3">

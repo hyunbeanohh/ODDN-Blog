@@ -73,3 +73,4 @@ yarn-error.log
 
 # Generated build artifacts (빌드 전 스크립트로 자동 생성됨)
 content/content-index.json
+static/search-documents.json

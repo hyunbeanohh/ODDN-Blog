@@ -49,9 +49,13 @@
     "msgpackr": "^1.11.2"
   },
   "scripts": {
-    "prebuild": "node scripts/generate-content-index.js",
+    "prebuild": "node scripts/generate-content-index.js && node scripts/generate-search-documents.js",
     "build": "gatsby build",
-    "build:ci": "node scripts/generate-content-index.js && gatsby build",
+    "build:ci": "node scripts/generate-content-index.js && node scripts/generate-search-documents.js && gatsby build",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy",
+    "cf:d1:migrate:local": "wrangler d1 migrations apply my-blog --local",
+    "cf:d1:migrate:remote": "wrangler d1 migrations apply my-blog --remote",
     "dev": "node scripts/prepare-gatsby-dev-cache.js && gatsby develop",
     "dev:watch": "node watch-mdx.js",
     "dev:watch:clean": "node watch-mdx.js --clean",

@@ -257,11 +257,29 @@ const handleLikesPost = async (request: Request, env: Env) => {
   const existingVisitorId = getVisitorId(request)
   const visitorId = existingVisitorId || createVisitorId()
 
-  await env.DB.prepare(
-    "INSERT OR IGNORE INTO post_likes (post_slug, visitor_id, created_at) VALUES (?, ?, ?)"
+  const existing = await env.DB.prepare(
+    "SELECT 1 AS liked FROM post_likes WHERE post_slug = ? AND visitor_id = ? LIMIT 1"
   )
-    .bind(slug, visitorId, new Date().toISOString())
-    .run()
+    .bind(slug, visitorId)
+    .first<{ liked: number }>()
+
+  let liked: boolean
+
+  if (existing) {
+    await env.DB.prepare(
+      "DELETE FROM post_likes WHERE post_slug = ? AND visitor_id = ?"
+    )
+      .bind(slug, visitorId)
+      .run()
+    liked = false
+  } else {
+    await env.DB.prepare(
+      "INSERT INTO post_likes (post_slug, visitor_id, created_at) VALUES (?, ?, ?)"
+    )
+      .bind(slug, visitorId, new Date().toISOString())
+      .run()
+    liked = true
+  }
 
   const countResult = await env.DB.prepare(
     "SELECT COUNT(*) AS count FROM post_likes WHERE post_slug = ?"
@@ -271,7 +289,7 @@ const handleLikesPost = async (request: Request, env: Env) => {
 
   const response = createJsonResponse({
     count: Number(countResult?.count ?? 0),
-    liked: true,
+    liked,
   })
 
   if (!existingVisitorId) {

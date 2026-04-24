@@ -50,7 +50,7 @@ const PostReactions = ({ slug }: PostReactionsProps) => {
   }, [slug])
 
   const handleLike = async () => {
-    if (liked || submitting) return
+    if (submitting) return
 
     setSubmitting(true)
     setError(null)
@@ -92,7 +92,7 @@ const PostReactions = ({ slug }: PostReactionsProps) => {
         <button
           type="button"
           onClick={handleLike}
-          disabled={loading || liked || submitting}
+          disabled={loading || submitting}
           className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
             liked
               ? "bg-blue-500 text-white"
@@ -100,7 +100,7 @@ const PostReactions = ({ slug }: PostReactionsProps) => {
           } disabled:cursor-not-allowed disabled:opacity-80`}
         >
           <span aria-hidden="true">{liked ? "♥" : "♡"}</span>
-          {liked ? "추천 완료" : submitting ? "저장 중..." : "추천하기"}
+          {submitting ? "저장 중..." : liked ? "추천 취소" : "추천하기"}
         </button>
       </div>
 
